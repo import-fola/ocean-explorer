@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animations and effects */
+@keyframes wave {
+  0%, 100% { transform: translateX(0) translateY(0) rotate(0deg); }
+  25% { transform: translateX(5px) translateY(-5px) rotate(1deg); }
+  50% { transform: translateX(-5px) translateY(-10px) rotate(-1deg); }
+  75% { transform: translateX(-5px) translateY(-5px) rotate(1deg); }
+}
+
+@keyframes sunRays {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.wave-animation {
+  background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+  animation: wave 3s ease-in-out infinite;
+  height: 100%;
+  width: 100%;
+}
+
+.sun-rays {
+  background: conic-gradient(from 0deg, transparent, rgba(255,255,255,0.1), transparent, rgba(255,255,255,0.1), transparent);
+  border-radius: 50%;
+  animation: sunRays 20s linear infinite;
+  width: 100%;
+  height: 100%;
+}
+
+/* 3D card flip effect */
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* High contrast mode */
+.high-contrast {
+  filter: contrast(150%) brightness(120%);
+}
+
+.high-contrast .bg-white\/10 {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.high-contrast .text-white\/80 {
+  color: rgba(255, 255, 255, 0.95) !important;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Focus styles for accessibility */
+button:focus,
+[tabindex]:focus {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+/* Loading states */
+.loading {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.loaded {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive text scaling */
+@media (max-width: 640px) {
+  .text-6xl { font-size: 3rem; }
+  .text-8xl { font-size: 4rem; }
+}
+
+/* Performance optimizations */
+.parallax-layer {
+  will-change: transform;
+}
+
+.species-item {
+  will-change: transform;
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.7);
+}
