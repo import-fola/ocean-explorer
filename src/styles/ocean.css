@@ -1,11 +1,11 @@
 /* Ocean Container */
 .ocean-container {
   position: relative;
-  height: 500vh; /* Adjusted for better proportions */
+  height: 400vh;
   overflow-x: hidden;
 }
 
-/* Background Layers with smoother transitions */
+/* Background Layers with ultra-smooth transitions */
 .ocean-background {
   position: fixed;
   top: 0;
@@ -25,65 +25,61 @@
   background-position: center;
   background-repeat: no-repeat;
   will-change: opacity, transform;
+  transition: opacity 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Improved ocean zone backgrounds with better color transitions */
-.background-layer.sunlight {
+/* Zone-specific background layers */
+.zone-sunlight {
   background: linear-gradient(180deg, 
-    #87CEEB 0%,
-    #4682B4 15%,
-    #1E90FF 30%,
-    #0066CC 50%,
-    #003d7a 70%,
-    #002952 85%,
-    #001f3f 100%
+    hsl(195, 53%, 75%) 0%,
+    hsl(207, 44%, 65%) 25%,
+    hsl(213, 100%, 55%) 50%,
+    hsl(213, 100%, 45%) 75%,
+    hsl(213, 100%, 35%) 100%
   );
 }
 
-.background-layer.twilight {
+.zone-twilight {
   background: linear-gradient(180deg,
-    #002952 0%,
-    #001f3f 15%,
-    #001529 30%,
-    #000d1a 50%,
-    #00070f 70%,
-    #000305 85%,
-    #000000 100%
+    hsl(213, 100%, 25%) 0%,
+    hsl(220, 100%, 20%) 25%,
+    hsl(225, 100%, 15%) 50%,
+    hsl(230, 100%, 10%) 75%,
+    hsl(235, 100%, 5%) 100%
   );
 }
 
-.background-layer.midnight {
+.zone-midnight {
   background: linear-gradient(180deg,
-    #000000 0%,
-    #0a0a0a 20%,
-    #050505 40%,
-    #000000 60%,
-    #000000 80%,
-    #000000 100%
+    hsl(240, 100%, 5%) 0%,
+    hsl(240, 100%, 3%) 25%,
+    hsl(240, 100%, 2%) 50%,
+    hsl(240, 100%, 1%) 75%,
+    hsl(240, 100%, 0%) 100%
   );
 }
 
-.background-layer.abyssal {
+.zone-abyssal {
   background: linear-gradient(180deg,
-    #000000 0%,
-    #0a0a0a 25%,
-    #050505 50%,
-    #000000 75%,
-    #000000 100%
+    hsl(240, 100%, 0%) 0%,
+    hsl(240, 50%, 1%) 25%,
+    hsl(240, 30%, 0.5%) 50%,
+    hsl(240, 20%, 0.2%) 75%,
+    hsl(240, 100%, 0%) 100%
   );
 }
 
-.background-layer.hadal {
+.zone-hadal {
   background: linear-gradient(180deg,
-    #000000 0%,
-    #0d0015 25%,
-    #1a0033 50%,
-    #0d0015 75%,
-    #000000 100%
+    hsl(240, 100%, 0%) 0%,
+    hsl(270, 100%, 2%) 20%,
+    hsl(285, 100%, 4%) 40%,
+    hsl(270, 100%, 2%) 60%,
+    hsl(240, 100%, 0%) 100%
   );
 }
 
-/* Enhanced Depth Ruler */
+/* Enhanced Depth Ruler with smoother animations */
 .depth-ruler {
   position: fixed;
   left: 20px;
@@ -91,15 +87,15 @@
   transform: translateY(-50%);
   width: 140px;
   height: 85vh;
-  background: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(15px);
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
   border-radius: 12px;
   padding: 20px 15px;
   z-index: 100;
   color: white;
   font-family: 'Courier New', monospace;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .ruler-header {
@@ -134,8 +130,8 @@
 .depth-value {
   font-size: 22px;
   font-weight: bold;
-  color: #60a5fa;
   line-height: 1;
+  transition: color 0.5s ease;
 }
 
 .depth-unit {
@@ -183,11 +179,10 @@
   left: -8px;
   width: 14px;
   height: 14px;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
   border-radius: 50%;
   border: 2px solid white;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
   z-index: 10;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .depth-marker {
@@ -323,17 +318,11 @@
 
 .progress-fill {
   width: 100%;
-  background: linear-gradient(180deg, 
-    #60a5fa 0%, 
-    #3b82f6 25%, 
-    #1d4ed8 50%, 
-    #1e40af 75%, 
-    #1e3a8a 100%
-  );
   border-radius: 3px;
   position: absolute;
   bottom: 0;
   left: 0;
+  transition: height 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .progress-labels {
@@ -359,8 +348,8 @@
   position: absolute;
   pointer-events: auto;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: transform;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform, opacity;
 }
 
 .sea-creature:hover {
@@ -378,18 +367,18 @@
 .creature-body {
   position: relative;
   border-radius: 50%;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
-/* Creature sizes - made more visible */
+/* Creature sizes */
 .sea-creature.tiny .creature-body { width: 16px; height: 16px; }
 .sea-creature.small .creature-body { width: 28px; height: 28px; }
 .sea-creature.medium .creature-body { width: 44px; height: 44px; }
 .sea-creature.large .creature-body { width: 64px; height: 64px; }
 .sea-creature.giant .creature-body { width: 84px; height: 84px; }
 
-/* Enhanced creature types with better visibility */
+/* Enhanced creature types */
 .creature-body.dolphin {
   background: linear-gradient(135deg, #4a90e2 0%, #357abd 50%, #2c5aa0 100%);
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
@@ -576,7 +565,7 @@
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   z-index: 1000;
   border: 1px solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
@@ -604,15 +593,15 @@
   top: 20px;
   right: 20px;
   max-width: 320px;
-  background: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(15px);
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
   border-radius: 12px;
   padding: 24px;
   color: white;
   z-index: 90;
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .zone-name {
@@ -665,8 +654,8 @@
   right: 20px;
   width: 56px;
   height: 56px;
-  background: rgba(0, 0, 0, 0.9);
-  backdrop-filter: blur(15px);
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(20px);
   border: none;
   border-radius: 50%;
   color: white;
@@ -675,22 +664,21 @@
   align-items: center;
   justify-content: center;
   z-index: 100;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
 .sound-toggle:hover {
-  background: rgba(0, 0, 0, 0.95);
+  background: rgba(0, 0, 0, 1);
   transform: scale(1.1);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
 }
 
 /* Depth Sections */
 .depth-section {
   position: relative;
   z-index: 10;
-  transition: background 1s ease-in-out;
 }
 
 /* Responsive Design */
@@ -751,7 +739,7 @@
 .background-layer,
 .depth-indicator,
 .progress-fill {
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 /* Smooth scrolling */

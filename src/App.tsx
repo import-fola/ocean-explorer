@@ -14,6 +14,7 @@ function App() {
   const [currentDepth, setCurrentDepth] = useState(0);
   const [currentZone, setCurrentZone] = useState(oceanZones[0]);
   const [visibleCreatures, setVisibleCreatures] = useState<string[]>([]);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,34 +22,48 @@ function App() {
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
       
-      // Start depth calculation after hero section
+      // Hero section height
       const heroHeight = windowHeight;
-      const oceanScrolled = Math.max(0, scrolled - heroHeight);
-      const oceanHeight = documentHeight - heroHeight;
       
-      // Calculate depth based on scroll position in ocean section only
+      // Only calculate ocean depth after hero section
+      if (scrolled <= heroHeight) {
+        setCurrentDepth(0);
+        setScrollProgress(0);
+        setCurrentZone(oceanZones[0]);
+        return;
+      }
+      
+      // Ocean section calculations
+      const oceanScrolled = scrolled - heroHeight;
+      const oceanHeight = documentHeight - heroHeight;
+      const progress = Math.min(1, Math.max(0, oceanScrolled / oceanHeight));
+      
+      setScrollProgress(progress);
+      
+      // Linear depth calculation for smooth transitions
       const maxDepth = 11000;
-      const scrollPercentage = oceanScrolled / oceanHeight;
-      const newDepth = Math.min(maxDepth, Math.max(0, scrollPercentage * maxDepth));
+      const newDepth = progress * maxDepth;
       setCurrentDepth(newDepth);
 
-      // Determine current zone with smooth transitions
-      let zone = oceanZones[0];
-      for (let i = 0; i < oceanZones.length; i++) {
-        if (newDepth >= oceanZones[i].depthStart && newDepth <= oceanZones[i].depthEnd) {
-          zone = oceanZones[i];
+      // Find current zone with precise boundaries
+      let activeZone = oceanZones[0];
+      for (const zone of oceanZones) {
+        if (newDepth >= zone.depthStart && newDepth < zone.depthEnd) {
+          activeZone = zone;
           break;
         }
       }
-      setCurrentZone(zone);
+      setCurrentZone(activeZone);
 
-      // Update visible creatures based on depth with larger visibility range
+      // Update visible creatures with smooth visibility
       const creatures: string[] = [];
-      oceanZones.forEach(z => {
-        z.creatures.forEach(creature => {
-          const creatureCenter = (creature.minDepth + creature.maxDepth) / 2;
-          const visibilityRange = 2000; // Increased visibility range
-          if (Math.abs(newDepth - creatureCenter) < visibilityRange) {
+      oceanZones.forEach(zone => {
+        zone.creatures.forEach(creature => {
+          const creatureDepthRange = creature.maxDepth - creature.minDepth;
+          const visibilityBuffer = Math.max(1000, creatureDepthRange * 0.5);
+          
+          if (newDepth >= creature.minDepth - visibilityBuffer && 
+              newDepth <= creature.maxDepth + visibilityBuffer) {
             creatures.push(creature.id);
           }
         });
@@ -74,19 +89,24 @@ function App() {
         
         <SoundManager depth={currentDepth} />
         
-        {/* Dynamic background layers with smooth transitions */}
+        {/* Dynamic background with smooth zone transitions */}
         <div className="ocean-background">
-          {oceanZones.map((zone, index) => (
-            <div
-              key={zone.id}
-              className={`background-layer ${zone.id}`}
-              style={{
-                opacity: getZoneOpacity(currentDepth, zone),
-                transform: `translateY(${getParallaxOffset(currentDepth, index)}px)`,
-                transition: 'opacity 1s ease-in-out'
-              }}
-            />
-          ))}
+          {oceanZones.map((zone, index) => {
+            const zoneProgress = getZoneProgress(currentDepth, zone);
+            const opacity = getZoneOpacity(currentDepth, zone);
+            
+            return (
+              <div
+                key={zone.id}
+                className={`background-layer zone-${zone.id}`}
+                style={{
+                  opacity: opacity,
+                  transform: `translateY(${scrollProgress * 50 * (index + 1)}px)`,
+                  background: getZoneBackground(zone, zoneProgress)
+                }}
+              />
+            );
+          })}
         </div>
 
         {/* Animated sea creatures */}
@@ -106,14 +126,13 @@ function App() {
         {/* Zone information overlay */}
         <ZoneOverlay zone={currentZone} depth={currentDepth} />
 
-        {/* Scrollable content sections - one for each zone */}
-        {oceanZones.map((zone, index) => (
+        {/* Scrollable content sections */}
+        {oceanZones.map((zone) => (
           <section
             key={zone.id}
             className="depth-section"
             style={{ 
-              height: `${(zone.depthEnd - zone.depthStart) / 11000 * 500}vh`,
-              background: `linear-gradient(180deg, ${getZoneGradient(zone)})`
+              height: `${((zone.depthEnd - zone.depthStart) / 11000) * 400}vh`,
             }}
             data-zone={zone.id}
           />
@@ -123,38 +142,73 @@ function App() {
   );
 }
 
-// Improved helper functions
+// Improved helper functions for crisp transitions
+function getZoneProgress(currentDepth: number, zone: any): number {
+  if (currentDepth < zone.depthStart) return 0;
+  if (currentDepth > zone.depthEnd) return 1;
+  return (currentDepth - zone.depthStart) / (zone.depthEnd - zone.depthStart);
+}
+
 function getZoneOpacity(currentDepth: number, zone: any): number {
-  const buffer = 500; // Transition buffer zone
+  const transitionZone = 200; // Crisp 200m transition zone
   
-  if (currentDepth < zone.depthStart - buffer) return 0;
-  if (currentDepth > zone.depthEnd + buffer) return 0;
+  // Before zone starts
+  if (currentDepth < zone.depthStart - transitionZone) return 0;
   
-  if (currentDepth >= zone.depthStart && currentDepth <= zone.depthEnd) {
-    return 1;
-  }
+  // After zone ends
+  if (currentDepth > zone.depthEnd + transitionZone) return 0;
   
-  // Fade in/out in buffer zones
+  // In the main zone
+  if (currentDepth >= zone.depthStart && currentDepth <= zone.depthEnd) return 1;
+  
+  // Fade in transition
   if (currentDepth < zone.depthStart) {
-    return (currentDepth - (zone.depthStart - buffer)) / buffer;
-  } else {
-    return 1 - ((currentDepth - zone.depthEnd) / buffer);
+    return Math.pow((currentDepth - (zone.depthStart - transitionZone)) / transitionZone, 2);
   }
+  
+  // Fade out transition
+  return Math.pow(1 - ((currentDepth - zone.depthEnd) / transitionZone), 2);
 }
 
-function getParallaxOffset(depth: number, layerIndex: number): number {
-  return depth * 0.05 * (layerIndex + 1); // Reduced parallax for smoother effect
-}
-
-function getZoneGradient(zone: any): string {
-  const gradients = {
-    'sunlight': 'rgba(135, 206, 235, 0.1) 0%, rgba(70, 130, 180, 0.2) 100%',
-    'twilight': 'rgba(0, 41, 82, 0.2) 0%, rgba(0, 15, 41, 0.4) 100%',
-    'midnight': 'rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 100%',
-    'abyssal': 'rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.95) 100%',
-    'hadal': 'rgba(0, 0, 0, 0.95) 0%, rgba(26, 0, 51, 0.8) 50%, rgba(0, 0, 0, 1) 100%'
+function getZoneBackground(zone: any, progress: number): string {
+  const backgrounds = {
+    'sunlight': `linear-gradient(180deg, 
+      hsl(195, 53%, ${75 - progress * 15}%) 0%,
+      hsl(207, 44%, ${65 - progress * 20}%) 25%,
+      hsl(213, 100%, ${55 - progress * 25}%) 50%,
+      hsl(213, 100%, ${45 - progress * 25}%) 75%,
+      hsl(213, 100%, ${35 - progress * 20}%) 100%)`,
+    
+    'twilight': `linear-gradient(180deg,
+      hsl(213, 100%, ${25 - progress * 10}%) 0%,
+      hsl(220, 100%, ${20 - progress * 10}%) 25%,
+      hsl(225, 100%, ${15 - progress * 8}%) 50%,
+      hsl(230, 100%, ${10 - progress * 6}%) 75%,
+      hsl(235, 100%, ${5 - progress * 4}%) 100%)`,
+    
+    'midnight': `linear-gradient(180deg,
+      hsl(240, 100%, ${5 - progress * 3}%) 0%,
+      hsl(240, 100%, ${3 - progress * 2}%) 25%,
+      hsl(240, 100%, ${2 - progress * 1}%) 50%,
+      hsl(240, 100%, ${1 - progress * 0.5}%) 75%,
+      hsl(240, 100%, 0%) 100%)`,
+    
+    'abyssal': `linear-gradient(180deg,
+      hsl(240, 100%, 0%) 0%,
+      hsl(240, 50%, ${1 - progress * 0.5}%) 25%,
+      hsl(240, 30%, ${0.5 - progress * 0.3}%) 50%,
+      hsl(240, 20%, ${0.2 - progress * 0.1}%) 75%,
+      hsl(240, 100%, 0%) 100%)`,
+    
+    'hadal': `linear-gradient(180deg,
+      hsl(240, 100%, 0%) 0%,
+      hsl(270, 100%, ${2 + progress * 3}%) 20%,
+      hsl(285, 100%, ${4 + progress * 4}%) 40%,
+      hsl(270, 100%, ${2 + progress * 2}%) 60%,
+      hsl(240, 100%, 0%) 100%)`
   };
-  return gradients[zone.id as keyof typeof gradients] || 'transparent 0%, transparent 100%';
+  
+  return backgrounds[zone.id as keyof typeof backgrounds] || 'hsl(240, 100%, 0%)';
 }
 
 export default App;
